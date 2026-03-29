@@ -1,0 +1,87 @@
+{
+  "admin": {
+    "id": "admin",
+    "name": "Administrator",
+    "role": "admin",
+    "password": "admin123",
+    "email": "admin@college.edu"
+  },
+  "f9468068": {
+    "id": "f9468068",
+    "name": "Sowdeesh kumar",
+    "roll_number": "25it1000",
+    "password": "Sowdeesh kumar123",
+    "role": "student",
+    "student_type": "hosteler",
+    "department": "CSE",
+    "year": "1",
+    "email": "sowdeshkumar007@gmail.com",
+    "phone": "9345641685",
+    "created_at": "2026-03-29T09:57:16.140655"
+  },
+  "abbe35c4": {
+    "id": "abbe35c4",
+    "name": "pranesh",
+    "roll_number": "25it121",
+    "password": "pranesh123",
+    "role": "student",
+    "student_type": "hosteler",
+    "department": "IT",
+    "year": "1",
+    "email": "praneshpranesh003@gmail.com",
+    "phone": "9361545589",
+    "created_at": "2026-03-29T09:59:31.847115"
+  },
+  "8044bb53": {
+    "id": "8044bb53",
+    "name": "NIKHUL DASS",
+    "roll_number": "25IT107",
+    "password": "dass123",
+    "role": "student",
+    "student_type": "day_scholar",
+    "department": "IT",
+    "year": "1",
+    "email": "DASS@gmail.com",
+    "phone": "6381600620",
+    "created_at": "2026-03-29T10:11:21.454791"
+  },
+  "a1b58bfd": {
+    "id": "a1b58bfd",
+    "name": "KISHORE KUMAR",
+    "roll_number": "25IT081",
+    "password": "kishore123",
+    "role": "student",
+    "student_type": "hosteler",
+    "department": "IT",
+    "year": "1",
+    "email": "kishore@gmail.com",
+    "phone": "7094253641",
+    "created_at": "2026-03-29T10:13:07.911314"
+  },
+  "1527793a": {
+    "id": "1527793a",
+    "name": "pranesh kumar",
+    "roll_number": "25IT120",
+    "password": "kumar123",
+    "role": "student",
+    "student_type": "hosteler",
+    "department": "IT",
+    "year": "1",
+    "email": "kumar@gmail.com",
+    "phone": "8807082705",
+    "created_at": "2026-03-29T10:14:51.272433"
+  },
+  "9dacebfc": {
+    "id": "9dacebfc",
+    "name": "nithis.T",
+    "roll_number": "25IT113",
+    "password": "nithis.t123",
+    "role": "student",
+    "student_type": "hosteler",
+    "department": "IT",
+    "year": "1",
+    "email": "NITHIST@gmail.com",
+    "phone": "8248600489",
+    "created_at": "2026-03-29T10:16:51.986418"
+  }
+}

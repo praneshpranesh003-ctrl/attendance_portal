@@ -1,0 +1,74 @@
+{
+  "f9468068": {
+    "physics": {
+      "2026-03-29": "late"
+    },
+    "chemistry": {
+      "2026-03-29": "present"
+    },
+    "phy": {
+      "2026-03-29": "present"
+    },
+    "math": {
+      "2026-03-29": "late"
+    }
+  },
+  "abbe35c4": {
+    "physics": {
+      "2026-03-29": "present"
+    },
+    "chemistry": {
+      "2026-03-29": "present"
+    },
+    "phy": {
+      "2026-03-29": "present"
+    },
+    "math": {
+      "2026-03-29": "present"
+    }
+  },
+  "8044bb53": {
+    "chemistry": {
+      "2026-03-29": "present"
+    },
+    "phy": {
+      "2026-03-29": "present"
+    },
+    "math": {
+      "2026-03-29": "present"
+    }
+  },
+  "a1b58bfd": {
+    "chemistry": {
+      "2026-03-29": "present"
+    },
+    "phy": {
+      "2026-03-29": "present"
+    },
+    "math": {
+      "2026-03-29": "late"
+    }
+  },
+  "1527793a": {
+    "chemistry": {
+      "2026-03-29": "present"
+    },
+    "phy": {
+      "2026-03-29": "present"
+    },
+    "math": {
+      "2026-03-29": "present"
+    }
+  },
+  "9dacebfc": {
+    "chemistry": {
+      "2026-03-29": "present"
+    },
+    "phy": {
+      "2026-03-29": "present"
+    },
+    "math": {
+      "2026-03-29": "present"
+    }
+  }
+}

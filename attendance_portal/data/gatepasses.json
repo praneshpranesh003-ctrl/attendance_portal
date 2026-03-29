@@ -1,0 +1,17 @@
+[
+  {
+    "id": "f4ee56fe",
+    "student_id": "abbe35c4",
+    "student_name": "pranesh",
+    "roll_number": "25it121",
+    "reason": "home",
+    "destination": "home",
+    "departure_date": "2026-03-28",
+    "return_date": "2026-03-31",
+    "contact": "9361545589",
+    "status": "approved",
+    "requested_at": "2026-03-29T10:08:25.401978",
+    "admin_remark": "",
+    "reviewed_at": "2026-03-29T10:08:58.635410"
+  }
+]

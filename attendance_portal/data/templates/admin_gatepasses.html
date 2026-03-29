@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Gate Passes — KPRXX Admin{% endblock %}
+
+{% block head %}
+<style>
+  .gp-detail { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .remark-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .remark-form input { flex: 1; min-width: 120px; }
+  .filter-tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+  .filter-tab {
+    padding: 7px 16px; border-radius: 8px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); font-family: var(--font-body);
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .filter-tab.active { border-color: var(--accent); color: var(--accent); background: rgba(59,130,246,0.08); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>Gate Passes</h2>
+  <p>Manage hostel gate pass requests from students</p>
+</div>
+
+<div class="filter-tabs">
+  <button class="filter-tab active" onclick="filterPasses('all', this)">All ({{ gatepasses | length }})</button>
+  <button class="filter-tab" onclick="filterPasses('pending', this)">Pending ({{ gatepasses | selectattr('status','eq','pending') | list | length }})</button>
+  <button class="filter-tab" onclick="filterPasses('approved', this)">Approved ({{ gatepasses | selectattr('status','eq','approved') | list | length }})</button>
+  <button class="filter-tab" onclick="filterPasses('rejected', this)">Rejected ({{ gatepasses | selectattr('status','eq','rejected') | list | length }})</button>
+</div>
+
+<div class="table-wrap">
+  <table id="gpTable">
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Destination</th>
+        <th>Departure</th>
+        <th>Return</th>
+        <th>Reason</th>
+        <th>Requested</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for gp in gatepasses | sort(attribute='requested_at', reverse=True) %}
+      <tr data-status="{{ gp.status }}">
+        <td>
+          <div style="font-weight:600">{{ gp.student_name }}</div>
+          <div class="gp-detail">{{ gp.roll_number }}</div>
+        </td>
+        <td><strong>{{ gp.destination }}</strong></td>
+        <td>{{ gp.departure_date }}</td>
+        <td>{{ gp.return_date }}</td>
+        <td>
+          <span title="{{ gp.reason }}">{{ gp.reason[:40] }}{% if gp.reason|length > 40 %}…{% endif %}</span>
+          {% if gp.admin_remark %}
+          <div class="gp-detail" style="color:var(--yellow)"><i class="fa fa-message"></i> {{ gp.admin_remark }}</div>
+          {% endif %}
+        </td>
+        <td style="white-space:nowrap">{{ gp.requested_at[:10] }}</td>
+        <td>
+          <span class="badge {% if gp.status == 'approved' %}badge-green{% elif gp.status == 'rejected' %}badge-red{% else %}badge-yellow{% endif %}">
+            {{ gp.status.title() }}
+          </span>
+        </td>
+        <td>
+          {% if gp.status == 'pending' %}
+          <form method="POST" action="/admin/gatepass/{{ gp.id }}/action">
+            <div class="remark-form">
+              <input type="text" name="remark" placeholder="Optional remark…" style="min-width:100px"/>
+              <button type="submit" name="action" value="approve" class="btn btn-success btn-sm"><i class="fa fa-check"></i></button>
+              <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm"><i class="fa fa-xmark"></i></button>
+            </div>
+          </form>
+          {% else %}
+            <span style="color:var(--muted);font-size:12px">Reviewed</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if not gatepasses %}
+  <div style="text-align:center;padding:48px;color:var(--muted)">
+    <i class="fa fa-door-open" style="font-size:40px;margin-bottom:12px;display:block"></i>
+    No gate passes submitted yet
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function filterPasses(status, btn) {
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('#gpTable tbody tr').forEach(row => {
+      row.style.display = status === 'all' || row.dataset.status === status ? '' : 'none';
+    });
+  }
+</script>
+{% endblock %}

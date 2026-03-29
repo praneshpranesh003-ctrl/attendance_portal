@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — KPRXX{% endblock %}
+
+{% block head %}
+<style>
+  .pending-gp {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .pending-gp h4 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .pending-gp p { font-size: 12px; color: var(--muted); }
+  .act-btns { display: flex; gap: 6px; }
+
+  .student-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .student-row:last-child { border-bottom: none; }
+  .student-avatar {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 14px; font-weight: 800; color: white;
+    flex-shrink: 0;
+  }
+  .student-info { flex: 1; min-width: 0; }
+  .student-info h4 { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .student-info p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .student-att { text-align: right; min-width: 60px; }
+  .student-att .pct { font-family: var(--font-display); font-size: 16px; font-weight: 800; }
+
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    z-index: 1000; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px; width: 420px; max-width: 95vw;
+    animation: modalIn 0.3s ease;
+  }
+  @keyframes modalIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+  .modal h3 { font-family: var(--font-display); font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  .modal p { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>Admin Dashboard</h2>
+  <p>Manage students, attendance, and hostel gate passes</p>
+</div>
+
+<!-- Stat Cards -->
+<div class="stat-grid">
+  <div class="stat-card blue">
+    <div class="stat-label">Total Students</div>
+    <div class="stat-value">{{ total_students }}</div>
+    <div class="stat-sub">Registered accounts</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-label">Hostelers</div>
+    <div class="stat-value" style="color:var(--green)">{{ hostelers }}</div>
+    <div class="stat-sub">In campus hostel</div>
+  </div>
+  <div class="stat-card purple">
+    <div class="stat-label">Day Scholars</div>
+    <div class="stat-value" style="color:var(--accent3)">{{ day_scholars }}</div>
+    <div class="stat-sub">External students</div>
+  </div>
+  <div class="stat-card yellow">
+    <div class="stat-label">Pending Passes</div>
+    <div class="stat-value" style="color:var(--yellow)">{{ pending_passes | length }}</div>
+    <div class="stat-sub">Awaiting approval</div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Pending Gate Passes -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div>
+        <h3 style="font-family:var(--font-display);font-weight:800;font-size:18px">Pending Gate Passes</h3>
+        <p style="color:var(--muted);font-size:13px;margin-top:2px">Awaiting your approval</p>
+      </div>
+      <a href="/admin/gatepasses" class="btn btn-outline btn-sm">View All</a>
+    </div>
+
+    {% if pending_passes %}
+      {% for gp in pending_passes[:5] %}
+      <div class="pending-gp">
+        <div>
+          <h4>{{ gp.student_name }} <span style="color:var(--muted);font-weight:400;font-size:12px">({{ gp.roll_number }})</span></h4>
+          <p>{{ gp.destination }} &nbsp;·&nbsp; {{ gp.departure_date }} → {{ gp.return_date }}</p>
+          <p style="margin-top:3px;font-style:italic;color:var(--muted)">{{ gp.reason[:60] }}{% if gp.reason|length > 60 %}...{% endif %}</p>
+        </div>
+        <div class="act-btns">
+          <form method="POST" action="/admin/gatepass/{{ gp.id }}/action" style="display:inline">
+            <input type="hidden" name="action" value="approve"/>
+            <button type="submit" class="btn btn-success btn-sm"><i class="fa fa-check"></i></button>
+          </form>
+          <form method="POST" action="/admin/gatepass/{{ gp.id }}/action" style="display:inline">
+            <input type="hidden" name="action" value="reject"/>
+            <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-xmark"></i></button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div style="text-align:center;padding:32px;color:var(--muted)">
+        <i class="fa fa-circle-check" style="font-size:36px;margin-bottom:10px;display:block;color:var(--green)"></i>
+        All gate passes reviewed!
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Recent Students -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div>
+        <h3 style="font-family:var(--font-display);font-weight:800;font-size:18px">Students</h3>
+        <p style="color:var(--muted);font-size:13px;margin-top:2px">Registered student accounts</p>
+      </div>
+      <a href="/admin/students" class="btn btn-outline btn-sm">View All</a>
+    </div>
+
+    {% set student_list = students.values() | list %}
+    {% if student_list %}
+      {% for s in student_list[:6] %}
+      <div class="student-row">
+        <div class="student-avatar">{{ s.name[0].upper() }}</div>
+        <div class="student-info">
+          <h4>{{ s.name }}</h4>
+          <p>{{ s.roll_number }} · {{ s.department }} · {{ s.student_type | replace('_',' ') | title }}</p>
+        </div>
+        <a href="/admin/student/{{ s.id }}" class="btn btn-outline btn-sm"><i class="fa fa-eye"></i></a>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div style="text-align:center;padding:32px;color:var(--muted)">
+        <i class="fa fa-users" style="font-size:36px;margin-bottom:10px;display:block"></i>
+        No students registered yet
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Quick Admin Actions -->
+<div class="card" style="margin-top:20px">
+  <h3 style="font-family:var(--font-display);font-weight:800;font-size:18px;margin-bottom:18px">Quick Actions</h3>
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <a href="/admin/attendance" class="btn btn-primary"><i class="fa fa-calendar-check"></i> Mark Attendance</a>
+    <a href="/admin/students" class="btn btn-outline"><i class="fa fa-users"></i> All Students</a>
+    <a href="/admin/gatepasses" class="btn btn-outline"><i class="fa fa-door-open"></i> Gate Passes</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KPRXX — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --bg: #0a0e1a; --surface: #111827; --surface2: #1a2235;
+      --border: #1e2d45; --accent: #3b82f6; --accent2: #06b6d4; --accent3: #8b5cf6;
+      --green: #10b981; --red: #ef4444; --text: #e2e8f0; --muted: #64748b;
+      --font-display: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: var(--font-body); min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    /* Animated background grid */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: 
+        linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridMove 20s linear infinite;
+    }
+    @keyframes gridMove { from { background-position: 0 0; } to { background-position: 40px 40px; } }
+
+    /* Glow blobs */
+    .blob {
+      position: fixed; border-radius: 50%; filter: blur(80px);
+      opacity: 0.12; pointer-events: none;
+    }
+    .blob-1 { width: 400px; height: 400px; background: var(--accent); top: -100px; right: 100px; animation: float1 8s ease-in-out infinite; }
+    .blob-2 { width: 300px; height: 300px; background: var(--accent3); bottom: -50px; left: 100px; animation: float2 10s ease-in-out infinite; }
+    @keyframes float1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,30px)} }
+    @keyframes float2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(20px,-20px)} }
+
+    .auth-container {
+      position: relative; z-index: 10;
+      display: flex; width: 900px; max-width: 95vw;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 24px; overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+      animation: slideUp 0.5s ease;
+    }
+    @keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+    /* Left panel */
+    .auth-left {
+      flex: 1; background: linear-gradient(145deg, #0d1929 0%, #0a1628 100%);
+      padding: 48px 40px; display: flex; flex-direction: column;
+      justify-content: space-between; position: relative; overflow: hidden;
+    }
+    .auth-left::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at top right, rgba(59,130,246,0.15), transparent 60%);
+    }
+    .brand { position: relative; z-index: 1; }
+    .brand h1 { font-family: var(--font-display); font-size: 28px; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; }
+    .brand p { color: var(--muted); font-size: 13px; margin-top: 6px; }
+    .feature-list { position: relative; z-index: 1; }
+    .feature-item { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
+    .feature-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; color: var(--accent); flex-shrink: 0;
+    }
+    .feature-item h4 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .feature-item p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .college-badge {
+      position: relative; z-index: 1;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .college-badge i { font-size: 22px; color: var(--accent2); }
+    .college-badge span { font-size: 12px; color: var(--muted); }
+    .college-badge strong { display: block; font-size: 14px; color: var(--text); }
+
+    /* Right panel */
+    .auth-right { width: 380px; padding: 48px 40px; flex-shrink: 0; max-height: 90vh; overflow-y: auto; }
+    .auth-tabs { display: flex; gap: 4px; background: var(--surface2); border-radius: 12px; padding: 4px; margin-bottom: 30px; }
+    .tab-btn {
+      flex: 1; padding: 9px; border-radius: 9px; border: none;
+      background: transparent; color: var(--muted); font-family: var(--font-body);
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .tab-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .auth-form { display: none; }
+    .auth-form.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .auth-form h3 { font-family: var(--font-display); font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+    .auth-form p { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .input-wrap { position: relative; }
+    .input-wrap i { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; pointer-events: none; }
+    input, select {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-family: var(--font-body);
+      font-size: 14px; padding: 11px 14px 11px 38px;
+      transition: border-color 0.2s; outline: none;
+    }
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    select { padding-left: 38px; }
+    select option { background: var(--surface2); }
+
+    .btn-auth {
+      width: 100%; padding: 13px; background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white; border: none; border-radius: 12px; font-family: var(--font-body);
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      transition: all 0.2s; margin-top: 8px;
+    }
+    .btn-auth:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59,130,246,0.4); }
+    .btn-auth:active { transform: none; }
+
+    .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+    .divider span { color: var(--muted); font-size: 12px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .flash-msg { padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+    .flash-error { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #f87171; }
+    .flash-success { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #34d399; }
+
+    @media (max-width: 768px) {
+      .auth-left { display: none; }
+      .auth-container { width: 100%; height: 100vh; border-radius: 0; }
+      .auth-right { width: 100%; padding: 32px 24px; max-height: 100vh; overflow-y: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="auth-container">
+    <!-- Left Panel -->
+    <div class="auth-left">
+      <div class="brand">
+        <h1>KPRXX</h1>
+        <p>Smart Attendance Management System</p>
+      </div>
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa fa-calendar-check"></i></div>
+          <div>
+            <h4>Real-time Attendance</h4>
+            <p>Track attendance subject-wise with instant percentage updates</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa fa-door-open"></i></div>
+          <div>
+            <h4>Hostel Gate Pass</h4>
+            <p>Digital gate pass approval for hostelers — request & track instantly</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa fa-chart-bar"></i></div>
+          <div>
+            <h4>Analytics Dashboard</h4>
+            <p>Visual insights for both students and administrators</p>
+          </div>
+        </div>
+      </div>
+      <div class="college-badge">
+        <i class="fa fa-graduation-cap"></i>
+        <div>
+          <strong>College Attendance Portal</strong>
+          <span>Powered by KPRXX v2.0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="auth-right">
+      <div class="auth-tabs">
+        <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn" onclick="switchTab('register')">Register</button>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="flash-msg flash-{{ category }}">
+            <i class="fa fa-{% if category == 'success' %}check-circle{% else %}circle-exclamation{% endif %}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endwith %}
+
+      <!-- Login Form -->
+      <div class="auth-form active" id="form-login">
+        <h3>Welcome back</h3>
+        <p>Sign in with your Roll Number or Email</p>
+        <form method="POST" action="/login">
+          <div class="form-group">
+            <label>Roll Number / Email</label>
+            <div class="input-wrap">
+              <i class="fa fa-user"></i>
+              <input type="text" name="identifier" placeholder="e.g. 21CS001 or admin" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrap">
+              <i class="fa fa-lock"></i>
+              <input type="password" name="password" placeholder="Your password" required/>
+            </div>
+          </div>
+          <button type="submit" class="btn-auth"><i class="fa fa-right-to-bracket"></i> Sign In</button>
+        </form>
+        <div class="divider"><span>Admin default</span></div>
+        <p style="font-size:12px;color:var(--muted);text-align:center">
+          Username: <strong style="color:var(--accent)">admin</strong> &nbsp;|&nbsp; Password: <strong style="color:var(--accent)">admin123</strong>
+        </p>
+      </div>
+
+      <!-- Register Form -->
+      <div class="auth-form" id="form-register">
+        <h3>Create account</h3>
+        <p>Register once, sign in anytime</p>
+        <form method="POST" action="/register">
+          <div class="form-group">
+            <label>Full Name</label>
+            <div class="input-wrap">
+              <i class="fa fa-user"></i>
+              <input type="text" name="name" placeholder="Your full name" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Roll Number</label>
+            <div class="input-wrap">
+              <i class="fa fa-id-card"></i>
+              <input type="text" name="roll_number" placeholder="e.g. 21CS001" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <div class="input-wrap">
+              <i class="fa fa-envelope"></i>
+              <input type="email" name="email" placeholder="college email"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <div class="input-wrap">
+              <i class="fa fa-phone"></i>
+              <input type="text" name="phone" placeholder="+91 XXXXXXXXXX"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Department</label>
+            <div class="input-wrap">
+              <i class="fa fa-building-columns"></i>
+              <select name="department">
+                <option value="CSE">Computer Science (CSE)</option>
+                <option value="ECE">Electronics (ECE)</option>
+                <option value="MECH">Mechanical (MECH)</option>
+                <option value="CIVIL">Civil Engineering</option>
+                <option value="EEE">Electrical (EEE)</option>
+                <option value="IT">Information Technology (IT)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Year</label>
+            <div class="input-wrap">
+              <i class="fa fa-calendar"></i>
+              <select name="year">
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Student Type</label>
+            <div class="input-wrap">
+              <i class="fa fa-house"></i>
+              <select name="student_type">
+                <option value="day_scholar">Day Scholar</option>
+                <option value="hosteler">Hosteler</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrap">
+              <i class="fa fa-lock"></i>
+              <input type="password" name="password" placeholder="Create a password" required/>
+            </div>
+          </div>
+          <button type="submit" class="btn-auth"><i class="fa fa-user-plus"></i> Create Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (tab==='login'&&i===0)||(tab==='register'&&i===1)));
+      document.getElementById('form-login').classList.toggle('active', tab === 'login');
+      document.getElementById('form-register').classList.toggle('active', tab === 'register');
+    }
+    // Auto-switch to register if flash has success (just registered)
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        {% if cat == 'success' %}
+          // already on login after success
+        {% endif %}
+      {% endfor %}
+    {% endwith %}
+  </script>
+</body>
+</html>

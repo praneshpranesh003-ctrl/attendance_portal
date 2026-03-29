@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}{{ student.name }} — KPRXX{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:20px">
+  <a href="/admin/students" class="btn btn-outline btn-sm"><i class="fa fa-arrow-left"></i> Back to Students</a>
+</div>
+
+<!-- Student Profile -->
+<div style="display:flex;align-items:center;gap:20px;margin-bottom:28px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px">
+  <div style="width:70px;height:70px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:28px;font-weight:800;color:white;flex-shrink:0">{{ student.name[0].upper() }}</div>
+  <div>
+    <h2 style="font-family:var(--font-display);font-size:22px;font-weight:800">{{ student.name }}</h2>
+    <p style="color:var(--muted);font-size:14px;margin-top:4px">{{ student.roll_number }} &nbsp;·&nbsp; {{ student.department }} &nbsp;·&nbsp; Year {{ student.year }}</p>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <span class="badge {% if student.student_type == 'hosteler' %}badge-blue{% else %}badge-green{% endif %}">{{ student.student_type | replace('_',' ') | title }}</span>
+      {% if student.email %}<span class="badge" style="background:rgba(100,116,139,0.15);color:var(--muted)"><i class="fa fa-envelope"></i> {{ student.email }}</span>{% endif %}
+      {% if student.phone %}<span class="badge" style="background:rgba(100,116,139,0.15);color:var(--muted)"><i class="fa fa-phone"></i> {{ student.phone }}</span>{% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Attendance by Subject -->
+<div class="card">
+  <h3 style="font-family:var(--font-display);font-weight:800;font-size:18px;margin-bottom:20px">Subject-wise Attendance</h3>
+
+  {% if subject_stats %}
+    {% for subj, s in subject_stats.items() %}
+    <div style="margin-bottom:28px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div>
+          <h4 style="font-size:16px;font-weight:700">{{ subj }}</h4>
+          <p style="color:var(--muted);font-size:13px">{{ s.present }} present / {{ s.total }} total</p>
+        </div>
+        <div style="font-family:var(--font-display);font-size:26px;font-weight:800;color:{% if s.percentage >= 75 %}var(--green){% elif s.percentage >= 60 %}var(--yellow){% else %}var(--red){% endif %}">{{ s.percentage }}%</div>
+      </div>
+      <div class="progress-bar" style="height:8px">
+        <div class="progress-fill {% if s.percentage >= 75 %}fill-green{% elif s.percentage >= 60 %}fill-yellow{% else %}fill-red{% endif %}" style="width:{{ s.percentage }}%"></div>
+      </div>
+      <!-- Date-wise record -->
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">
+        {% for d, status in s.records.items() | sort %}
+        <div title="{{ d }} — {{ status }}" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;
+          {% if status == 'present' %}background:rgba(16,185,129,0.15);color:#34d399
+          {% elif status == 'absent' %}background:rgba(239,68,68,0.15);color:#f87171
+          {% else %}background:rgba(245,158,11,0.15);color:#fbbf24{% endif %}">
+          {{ d }} — {{ status[0].upper() }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div style="text-align:center;padding:40px;color:var(--muted)">
+      <i class="fa fa-calendar-xmark" style="font-size:36px;margin-bottom:12px;display:block"></i>
+      No attendance records for this student yet
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Request Gate Pass — KPRXX{% endblock %}
+
+{% block head %}
+<style>
+  .gp-form-wrap { max-width: 600px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .info-box {
+    background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 12px; padding: 14px 18px; margin-bottom: 24px;
+    font-size: 13px; color: #93c5fd; display: flex; align-items: flex-start; gap: 10px;
+  }
+  @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:20px">
+  <a href="/student/dashboard" class="btn btn-outline btn-sm"><i class="fa fa-arrow-left"></i> Back to Dashboard</a>
+</div>
+
+<div class="gp-form-wrap">
+  <div class="page-header">
+    <h2>Request Gate Pass</h2>
+    <p>Submit your hostel gate pass request for admin approval</p>
+  </div>
+
+  <div class="info-box">
+    <i class="fa fa-circle-info" style="margin-top:2px;flex-shrink:0"></i>
+    <div>Gate pass requests are reviewed by the warden/admin. Please submit at least 24 hours before your planned departure. Emergency requests should be made in person at the warden's office.</div>
+  </div>
+
+  <div class="card">
+    <form method="POST" action="/student/gatepass">
+      <div class="form-group">
+        <label>Destination</label>
+        <div style="position:relative">
+          <i class="fa fa-location-dot" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted)"></i>
+          <input type="text" name="destination" placeholder="e.g. Home — Chennai, Tamil Nadu" required style="padding-left:38px"/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Departure Date</label>
+          <input type="date" name="departure_date" required/>
+        </div>
+        <div class="form-group">
+          <label>Return Date</label>
+          <input type="date" name="return_date" required/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Emergency Contact</label>
+        <div style="position:relative">
+          <i class="fa fa-phone" style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted)"></i>
+          <input type="text" name="contact" placeholder="Parent/Guardian phone number" style="padding-left:38px"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Reason for Leave</label>
+        <textarea name="reason" rows="4" placeholder="Please describe the reason for your gate pass request…" required style="resize:vertical"></textarea>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:8px">
+        <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> Submit Request</button>
+        <a href="/student/dashboard" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
